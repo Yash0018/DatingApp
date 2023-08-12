@@ -1,4 +1,5 @@
 {
   "csharpextensions.privateMemberPrefix": "_",
-  "explorer.autoReveal": false
+  "explorer.autoReveal": false,
+  "editor.formatOnSave": true
 }
