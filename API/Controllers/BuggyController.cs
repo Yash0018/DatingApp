@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    // Sole purpose is to return http error responses to the client
+    // It included bunch of request that returns various types of error 
     public class BuggyController: BaseApiController
     {
         private readonly DataContext _context;
@@ -25,10 +27,7 @@ namespace API.Controllers
         {
             var thing = _context.Users.Find(-1);
 
-            if (thing == null)
-            {
-                return NotFound();
-            }
+            if (thing == null) return NotFound(); 
 
             return thing;
         }
