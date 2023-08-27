@@ -1,12 +1,14 @@
+using API.Data;
 using API.Extensions;
 using API.Middleware;
+using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);    // Create an instance of a WebApplication    
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);    // This will configure our database add our services to the scope of our app which we can inject in our controllers             
+builder.Services.AddIdentityServices(builder.Configuration);    // This will help use authenticate user based on JWT token we generate for them using our "TokenKey" from appSettings 
 
 var app = builder.Build();
 
@@ -21,9 +23,23 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod()
     .WithOrigins("http://localhost:4200"));
 
-app.UseAuthentication();    // means you hold valid JWT token 
-app.UseAuthorization();     // means what are you allowed to do 
+app.UseAuthentication();    // Means you hold valid JWT token 
+app.UseAuthorization();     // Means what are you allowed to do 
 
 app.MapControllers();
+
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+try
+{
+    var context = services.GetRequiredService<DataContext> ();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
+}
+catch (Exception ex)
+{
+	var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during migration");
+}
 
 app.Run();
