@@ -73,6 +73,8 @@ namespace API.Controllers
 
             if (await _userRepository.SaveAllAsync())
             {
+                // This will return the url of "GetUser" endpoint to state that call this endpoint to see the changes made as result of this request
+                // Not mandatory by recommended
                 return CreatedAtAction(nameof(GetUser), new {username = user.UserName}, _mapper.Map<PhotoDto>(photo));
             }
 
